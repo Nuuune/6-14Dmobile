@@ -1,0 +1,210 @@
+/************************* 底部切换样式 ***************************/
+.foot-tab {
+  height: 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: .02rem solid #c5c3c4;
+}
+.foot-tab > div {
+  height: 1rem;
+}
+.foot-tab > div + div {
+  border-left: .02rem solid #c5c3c4;
+}
+.foot-tab .text {
+  font-size: .20rem;
+}
+.foot-tab .icon {
+  position: relative;
+  width: 0.42rem;
+  height: 0.42rem;
+}
+.foot-tab .icon > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+/************************** 打卡分页 *****************************/
+.header {
+  height: 1.4rem;
+  border-bottom: .02rem solid #eeeded;
+  background: #f9f9fa;
+  padding: .20rem;
+}
+.header .img {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+  margin: 0 .17rem;
+}
+.header .img > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.header .icon {
+  position: relative;
+  width: 0.42rem;
+  height: 0.42rem;
+}
+.header .icon > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.header .des {
+  height: 1rem;
+  padding: 0 0.08rem;
+}
+.name {
+  font-size: .32rem;
+  color: #000;
+}
+.age {
+  font-size: .28rem;
+  color: #747474;
+}
+/* 打卡模块 */
+.dk-wrap {
+  height: 9.67rem;
+}
+.dk-view {
+  width: 100%;
+  padding: .26rem 0;
+}
+.circle-bg {
+  border: .05rem solid #69c1ff;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #5abafe, #2192e1);
+  color: #fff;
+}
+.circle-bg .text {
+  font-size: .42rem;
+}
+.circle-bg .time {
+  font-size: .46rem;
+}
+/* 重写van step样式 */
+.van-step--vertical:not(:last-child)::after { border-bottom-width: 0;}
+.van-step:last-child > .van-step__line {
+  height: 25%;
+}
+.van-step .van-step__circle {
+  width: .44rem;
+  height: .44rem;
+}
+.van-step--vertical .van-step__circle {
+  top: .16rem;
+  left: -0.5rem;
+}
+.van-step:first-child  .van-step__circle::after, .van-step:not(:first-child) .van-step__circle::after{
+  position: absolute;
+  color: #fff;
+  left: 0.08rem;
+  top: 0.06rem;
+  font-style: initial;
+  font-size: 0.26rem;
+}
+.van-step:first-child  .van-step__circle::after {
+  content: '上';
+}
+.van-step:not(:first-child)  .van-step__circle::after {
+  content: '下';
+}
+.van-step--vertical .van-icon-checked {
+  width: .44rem;
+  height: .44rem;
+  top: .16rem;
+  left: -0.5rem;
+  background-color: #239aed;
+  border-radius: 50%;
+}
+.van-step--vertical .van-icon-checked::before {
+  content: ""
+}
+.van-steps--vertical {
+  padding: 0 0 0 1rem;
+}
+.van-step--vertical {
+  height: 1.3rem;
+}
+.van-step__title {
+  padding-left: .26rem;
+}
+
+/************************** 统计分页 *****************************/
+/* 时间选择部分 */
+.time-picker-wrap {
+  height: .76rem;
+  color: #303030;
+  font-size: .30rem;
+}
+.time-picker-wrap > div + div {
+  margin-left: .28rem;
+}
+.btn-ar-down {
+  width: .32rem;
+  height: .32rem;
+  border: .01rem solid #d8d8d8;
+  border-radius: .05rem;
+  position: relative;
+}
+.btn-ar-down::after {
+  position: absolute;
+  top: calc(50% - 0.04rem);
+  left: calc(50% - 0.06rem);
+  display: block;
+  content: "";
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-color: transparent;
+  border-top-color: #4bacf7;
+  border-width: 0.08rem;
+}
+/* 展示部分 */
+.show-wrap {
+  height: 2rem;
+  padding: .42rem;
+}
+.show-wrap > div:first-child {
+  padding-left: 0.08rem;
+}
+.show-wrap > div:last-child {
+  padding-right: 0.32rem;
+}
+.bg-blue {
+  background: #4bacf7;
+}
+.day-count {
+  font-size: .4rem;
+  color: #fff;
+}
+.day-count .num {
+  font-size: .8rem;
+}
+/* 次数部分 */
+.no-clock-wrap {
+  height: 2rem;
+  padding: .42rem;
+}
+.no-clock-cell {
+  width: 1.75rem;
+  height: 1rem;
+  font-size: .34rem;
+}
+.no-clock-cell .title {
+  color: #d2d2d2;
+}
+.no-clock-cell .num {
+  color: #303030;
+}
+.v-line {
+  height: .7rem;
+  width: .02rem;
+  background: #d2d2d2;
+}
