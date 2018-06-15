@@ -2,8 +2,8 @@
   <div>
     <!-- 时间选择器开始 -->
     <div class="flex flex-row flex-center time-picker-wrap">
-      <div>2018年6月</div>
-      <div class="btn-ar-down"></div>
+      <div>{{date.year}}年{{date.month}}月</div>
+      <div @click="showPop" class="btn-ar-down"></div>
     </div>
     <!-- 时间选择器结束 -->
     <!-- 正常记录开始 -->
@@ -31,14 +31,14 @@
     </div>
     <!-- 未打卡记录结束 -->
     <!-- 弹出层开始 -->
-    <Popup v-model="show" position="bottom">
+    <Popup v-model="show" position="bottom" @click-overlay="cancelPop">
       <div class="flex flex-row flex-between pop-btns">
-        <div class="btn-cancel">取消</div>
-        <div class="btn-success">确定</div>
+        <div @click="cancelPop" class="btn-cancel">取消</div>
+        <div @click="setDate" class="btn-success">确定</div>
       </div>
-      <div class="flex flex-row flex-center">
-        <Picker :columns="years" />
-        <Picker :columns="mouth" />
+      <div class="pickers flex flex-row flex-center">
+        <Picker @change="onYChange" :columns="years" />
+        <Picker @change="onMChange" :columns="month" />
       </div>
     </Popup>
     <!-- 弹出层结束 -->
@@ -46,51 +46,82 @@
 </template>
 <script>
 import { Popup, Picker } from 'vant';
+import { getCurrYM } from '@/utils/date';
+
+const defaultDate = {
+  year: `1999`,
+  month: `1`
+};
 
 export default {
   name: 'clock-count',
-  data() {
-    return {
-      show: true
-    };
-  },
-  created() {
-    this.yearRange = [1995, 2040];
-  },
-  computed: {
-    years() {
-      const minY = this.yearRange[0];
-      const maxY = this.yearRange[1];
-      const output = [];
-      for (let i = minY; i <= maxY; i++) {
-        output.push(`${i}年`);
-      }
-      return output;
-    },
-    mouth() {
-      const output = [];
-      for (let i = 1; i <= 12; i++) {
-        output.push(`${i}月`);
-      }
-      return output;
-    }
-  },
   components: {
     Popup,
     Picker
+  },
+  data() {
+    return {
+      show: false,
+      date: defaultDate,
+      tempDate: defaultDate
+    };
+  },
+  created() {
+    this.date = getCurrYM(); // 获取当前系统的年月
+    this.yearRange = [1995, 2040]; // 需要显示的年范围
+  },
+  computed: {
+    /* picker的年月选项由this.yearRange生成 --start */
+    years() {
+      const minY = this.yearRange[0];
+      const maxY = this.yearRange[1];
+      const currY = this.date.year;
+      let defaultIndex;
+      const output = [];
+      for (let i = minY; i <= maxY; i++) {
+        if (i === currY) {
+          defaultIndex = i - minY;
+        }
+        output.push(`${i}年`);
+      }
+      return [{ values: output, defaultIndex }];
+    },
+    month() {
+      const output = [];
+      const currM = this.date.month;
+      let defaultIndex;
+      for (let i = 1; i <= 12; i++) {
+        if (i === currM) {
+          defaultIndex = i - 1;
+        }
+        output.push(`${i}月`);
+      }
+      return [{ values: output, defaultIndex }];
+    }
+    /* picker的年月选项由this.yearRange生成 --end */
+  },
+  /* 方法部分 --start */
+  methods: {
+    onYChange(picker, values) {
+      this.tempDate.year = values[0].replace(/[^\d]/g, '');
+    },
+    onMChange(picker, values) {
+      this.tempDate.month = values[0].replace(/[^\d]/g, '');
+    },
+    cancelPop() {
+      console.log(`已取消选择`);
+      this.show = false;
+    },
+    setDate() {
+      console.log(`设置成功`);
+      this.date = Object.assign({}, this.tempDate);
+      this.show = false;
+    },
+    showPop() {
+      console.log(`弹窗`);
+      this.show = true;
+    }
   }
+  /* 方法部分 --end */
 };
 </script>
-<style>
-/* 弹窗控制按钮 */
-.pop-btns {
-  padding: .2rem;
-  font-size: .3rem;
-}
-.pop-btns .btn-cancel{
-  color: #303030;
-}
-.pop-btns .btn-success{
-  color: #35a5f3;
-}
-</style>

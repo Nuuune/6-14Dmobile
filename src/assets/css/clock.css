@@ -104,10 +104,16 @@
 .van-step:first-child  .van-step__circle::after, .van-step:not(:first-child) .van-step__circle::after{
   position: absolute;
   color: #fff;
-  left: 0.08rem;
-  top: 0.06rem;
+  left: 0.02rem;
+  top: 0.02rem;
   font-style: initial;
   font-size: 0.26rem;
+  width: .40rem;
+  height: .40rem;
+  border-radius: 50%;
+  background: #b9b9b9;
+  text-align: center;
+  line-height: .40rem;
 }
 .van-step:first-child  .van-step__circle::after {
   content: '上';
@@ -120,11 +126,18 @@
   height: .44rem;
   top: .16rem;
   left: -0.5rem;
-  background-color: #239aed;
+  background-color: #82cbff;
   border-radius: 50%;
 }
 .van-step--vertical .van-icon-checked::before {
-  content: ""
+  content: "";
+  width: .40rem;
+  height: .40rem;
+  position: absolute;
+  background: #239aed;
+  border-radius: 50%;
+  left: .02rem;
+  top: .02rem;
 }
 .van-steps--vertical {
   padding: 0 0 0 1rem;
@@ -207,4 +220,38 @@
   height: .7rem;
   width: .02rem;
   background: #d2d2d2;
+}
+/* 弹窗控制按钮 */
+.pop-btns {
+  padding: .2rem;
+  font-size: .3rem;
+}
+.pop-btns .btn-cancel{
+  color: #303030;
+}
+.pop-btns .btn-success{
+  color: #35a5f3;
+}
+.pickers > div + div {
+  margin-left: .6rem;
+}
+/* 重写picker样式 */
+.van-hairline--top-bottom::after {
+  display: none;
+}
+.van-picker-column__item--selected {
+  position: relative;
+}
+.van-picker-column__item--selected::after {
+  display: block;
+  content: "";
+  position: absolute;
+  width: 80%;
+  height: 0.02rem;
+  background: #35a5f3;
+  bottom: 10%;
+  left: 10%;
+}
+.van-picker-column {
+  font-size: .4rem;
 }

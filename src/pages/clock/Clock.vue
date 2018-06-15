@@ -3,12 +3,12 @@
     <component :is="currTabComponent"></component>
     <!-- 底部切换开始 -->
     <div class="foot-tab flex flex-row align-end">
-      <div class="flex flex-center flex-item-1">
-        <div class="icon"><img src="../../assets/images/location.png" /></div>
+      <div @click="changeTab(`Location`)" class="flex flex-center flex-item-1">
+        <div class="icon"><img src="@/assets/images/location.png" /></div>
         <div class="text">打卡</div>
       </div>
-      <div class="flex flex-center flex-item-1">
-        <div class="icon"><img src="../../assets/images/count.png" /></div>
+      <div @click="changeTab(`Count`)" class="flex flex-center flex-item-1">
+        <div class="icon"><img src="@/assets/images/count.png" /></div>
         <div class="text">统计</div>
       </div>
     </div>
@@ -24,14 +24,21 @@ export default {
   name: 'Clock',
   data() {
     return {
-      currTabComponent: Count
+      currTabComponent: `Location`
     };
   },
   components: {
     Location,
     Count
+  },
+  methods: {
+    changeTab(name) {
+      if (this.currTabComponent !== name) {
+        this.currTabComponent = name;
+      }
+    }
   }
 };
 </script>
 
-<style src="../../assets/css/clock.css"></style>
+<style src="@/assets/css/clock.css"></style>

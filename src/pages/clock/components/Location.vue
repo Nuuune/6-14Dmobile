@@ -11,8 +11,8 @@
           <span class="age">2018/06/07</span>
         </div>
       </div>
-      <div class="icon">
-        <img src="../../../assets/images/datemap.png" />
+      <div @click="popShow" class="icon">
+        <img src="@/assets/images/datemap.png" />
       </div>
     </div>
     <!-- 人物信息结束 -->
@@ -36,13 +36,233 @@
       </div>
     </div>
     <!-- 打卡模块结束 -->
+    <!-- 弹出层开始 -->
+    <Popup v-model="show" position="bottom" >
+      <div class="flex flex-row flex-between pop-btns">
+        <div class="btn-cancel">取消</div>
+        <div class="title" style="fontSize: .32rem">请选择查看时间</div>
+        <div class="btn-success" style="opacity:0">确定</div>
+      </div>
+      <div class="datemap flex">
+        <div class="week">
+          <div>日</div>
+          <div>一</div>
+          <div>二</div>
+          <div>三</div>
+          <div>四</div>
+          <div>五</div>
+          <div>六</div>
+        </div>
+        <List
+        v-model="loading"
+        :finished="finished"
+        @load="onLoad">
+          <div class="curr-month" v-for="(month, idex) in monthes" :key="idex">
+            <div class="title">2018年06月</div>
+            <div class="date">
+              <div class="flex" v-for="(item, idex2) in month.dates" :key="idex2">
+                <div class="date-value" :class="'color' + item.color">
+                  {{item && item.value !== null ? item.value : ``}}
+                </div>
+                <div class="date-des">
+                  {{item && item.des !== null ? item.des : ``}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </List>
+      </div>
+    </Popup>
+    <!-- 弹出层结束 -->
   </div>
 </template>
 <script>
+import { List, Popup, Cell } from 'vant';
+import { getTotalDay } from '@/utils/date';
+
 export default {
   name: 'clock-location',
   data() {
-    return {};
+    return {
+      show: true,
+      monthes: [],
+      loading: false,
+      finished: false
+    };
+  },
+  components: {
+    Popup,
+    List,
+    Cell
+  },
+  methods: {
+    popShow() {
+      this.show = true;
+    },
+    onLoad() {
+      setTimeout(() => {
+        for (let i = 0; i < 3; i++) {
+          this.monthes.push({
+            dates: this.getDates({
+              year: 2018,
+              month: i + 1,
+              color1: [3, 6, 1, 8],
+              color2: [9, 5, 2],
+              des: [{ value: 5, des: `这是周五` }]
+            })
+          });
+        }
+        this.loading = false;
+
+        if (this.monthes.length >= 5) {
+          this.finished = true;
+        }
+      }, 500);
+    },
+    /**
+     * 获取一个月的日子
+     * @param  {[type]} option [
+     *  一个对象需要有年月如下：
+     *  {
+     *    year: 2018, 必要
+     *    month: 02,  必要
+     *    des: [      可选
+     *      {
+     *        value: 2,
+     *        des: '这是2号'
+     *      }
+     *    ],
+     *    color1: [4,5,....,22], 可选
+     *    color2: [1,2,.....24]  可选
+     *  }
+     *
+     * ]
+     * @return {[array]}       [返回一个可以直接push到this.monthes里的一个月日期表]
+     */
+    getDates(option) {
+      const { year, month, des, color1, color2 } = option;
+      const firstDay = new Date(year, month, 1);
+      const offsetDay = firstDay.getDay(); // 得到第一天是周几 就知道要移多少天
+      const totalDay = getTotalDay(firstDay);
+
+      const dates = []; // 将要生成的dates
+
+      // 处理偏移
+      if (offsetDay) {
+        for (let i = 0; i < offsetDay; i++) {
+          dates.push({ value: '' });
+        }
+      }
+
+      // 生成dates
+      for (let i = 1; i <= totalDay; i++) {
+        const date = { value: i, des: ``, color: `0` };
+
+        // 处理描述部分
+        if (des && des.length > 0) {
+          for (let j = 0; j < des.length; j++) {
+            if (des[j].value === i) {
+              date.des = des[j].des;
+              break;
+            }
+          }
+        } else {
+          date.des = null;
+        }
+
+        // 处理颜色部分
+        if (color1 && color1.length > 0) {
+          if (color1.indexOf(i) > 0) {
+            date.color = `1`;
+            console.log(date);
+            dates.push(date);
+            continue;
+          }
+        }
+        if (color2 && color2.length > 0) {
+          if (color2.indexOf(i) > 0) {
+            date.color = `2`;
+            console.log(date);
+            dates.push(date);
+            continue;
+          }
+        }
+        console.log(date);
+        dates.push(date);
+      }
+      console.log(dates);
+      return dates;
+    }
   }
 };
 </script>
+<style>
+.datemap .week {
+  height: .6rem;
+  text-align: center;
+  color: #303030;
+  background: #e0e0e0;
+  font-size: .26rem;
+  position: relative;
+  width: 100vw;
+}
+.datemap .week > div {
+  float: left;
+  height: 100%;
+  width: calc(100% / 7);
+  line-height: .6rem;
+}
+.datemap .week > div:first-child, .datemap .week > div:last-child {
+  color: #ff9900;
+}
+.datemap .curr-month {
+  position: relative;
+  width: 100vw;
+  height: 8.8rem;
+  font-size: .26rem;
+  border-bottom: .01rem solid #e4e4e4;
+}
+.datemap .curr-month .title {
+  width: 100%;
+  font-size: .3rem;
+  text-align: center;
+  padding: .2rem 0;
+}
+.datemap .curr-month .date {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.datemap .curr-month .date > div {
+  width: calc(100% / 7);
+  float: left;
+  height: 1.05rem;
+  margin: .2rem 0 0 0;
+}
+.datemap .curr-month .date-value {
+  border-radius: 50%;
+  width: .44rem;
+  height: .44rem;
+  font-size: .26rem;
+  line-height: .44rem;
+  text-align: center;
+}
+.datemap .curr-month .date-des {
+  font-size: .20rem;
+  color: #b2b2b2;
+  padding-top: .1rem;
+  text-align: center;
+}
+.van-list {
+  height: 9.7rem;
+  overflow-y: scroll;
+}
+.color1 {
+  background: #0fc9d0;
+  color: #fff;
+}
+.color2 {
+  background: #35a5f3;
+  color: #fff;
+}
+</style>
