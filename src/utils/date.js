@@ -6,8 +6,7 @@ export function getCurrYM() {
   };
 }
 export function getTotalDay(date) {
-  const temp = new Date(date);
-  temp.setMonth(temp.getMonth() + 1);
-  temp.setDate(0);
-  return temp.getDate();
+  date.setMonth(date.getMonth() + 1);
+  date.setDate(0);
+  return date.getDate();
 }

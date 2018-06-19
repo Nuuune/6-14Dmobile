@@ -9,6 +9,7 @@
 }
 .foot-tab > div {
   height: 1rem;
+  color: #7a7a7a;
 }
 .foot-tab > div + div {
   border-left: .02rem solid #c5c3c4;
@@ -18,13 +19,10 @@
 }
 .foot-tab .icon {
   position: relative;
-  width: 0.42rem;
-  height: 0.42rem;
+  font-size: 0.42rem;
 }
-.foot-tab .icon > img {
-  width: 100%;
-  height: 100%;
-  position: absolute;
+.foot-tab-active {
+  color: #239aed !important;
 }
 /************************** 打卡分页 *****************************/
 .header {
@@ -46,13 +44,8 @@
 }
 .header .icon {
   position: relative;
-  width: 0.42rem;
-  height: 0.42rem;
-}
-.header .icon > img {
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  font-size: 0.42rem;
+  color: #979797;
 }
 .header .des {
   height: 1rem;
@@ -66,6 +59,84 @@
   font-size: .28rem;
   color: #747474;
 }
+/* 日历表相关 */
+.datemap .week {
+  height: .6rem;
+  text-align: center;
+  color: #303030;
+  background: #e0e0e0;
+  font-size: .26rem;
+  position: relative;
+  width: 100vw;
+}
+.datemap .week > div {
+  float: left;
+  height: 100%;
+  width: calc(100% / 7);
+  line-height: .6rem;
+}
+.datemap .week > div:first-child, .datemap .week > div:last-child {
+  color: #ff9900;
+}
+.datemap .curr-month {
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  font-size: .26rem;
+  border-bottom: .01rem solid #e4e4e4;
+}
+.datemap .curr-month .title {
+  width: 100%;
+  font-size: .3rem;
+  text-align: center;
+  padding: .2rem 0;
+}
+.datemap .curr-month .date {
+  width: 100%;
+  overflow: hidden;
+}
+.datemap .curr-month .date > div {
+  width: calc(100% / 7);
+  float: left;
+  height: 1.05rem;
+  margin: .2rem 0 .1rem 0;
+}
+.datemap .curr-month .date-value {
+  border-radius: 50%;
+  width: .44rem;
+  height: .44rem;
+  font-size: .26rem;
+  line-height: .44rem;
+  text-align: center;
+}
+.datemap .curr-month .date-des {
+  font-size: .20rem;
+  color: #b2b2b2;
+  padding-top: .1rem;
+  text-align: center;
+}
+/* .van-list {
+  height: 8.5rem;
+  overflow-y: scroll;
+} */
+.color1 {
+  background: #0fc9d0;
+  color: #fff;
+}
+.color2 {
+  background: #35a5f3;
+  color: #fff;
+}
+.m-shape-big {
+  height: 8.8rem;
+}
+.m-shape-small {
+  height: 7.5rem;
+}
+.month-scroll {
+  height: 8.5rem;
+  overflow-y: scroll;
+}
 /* 打卡模块 */
 .dk-wrap {
   height: 9.67rem;
@@ -73,6 +144,10 @@
 .dk-view {
   width: 100%;
   padding: .26rem 0;
+}
+.dk-view .hlight {
+  padding-left: .25rem;
+  color: #000;
 }
 .circle-bg {
   border: .05rem solid #69c1ff;
@@ -89,6 +164,17 @@
   font-size: .46rem;
 }
 /* 重写van step样式 */
+.van-steps__items > div:not(:last-child) > .van-step__line {
+  top: 0.5rem !important;
+}
+.van-steps__items > div:last-child > .van-step__line {
+  height: 0 !important;
+}
+.van-step__line {
+  width: 0.02rem !important;
+  background-color: #a7a7a7 !important;
+  left: -0.3rem !important;
+}
 .van-step--vertical:not(:last-child)::after { border-bottom-width: 0;}
 .van-step:last-child > .van-step__line {
   height: 25%;
@@ -147,6 +233,22 @@
 }
 .van-step__title {
   padding-left: .26rem;
+  font-size: .3rem;
+}
+.van-step__title > div + div {
+  margin-top: .2rem;
+}
+/* 打卡对话框 */
+.dk-dialog .van-button__text{
+  width: 100%;
+  display: block;
+  background: url(../images/cancel.png) no-repeat;
+  height: 100%;
+  background-position: 50%;
+  background-size: .4rem;
+}
+.dk-dialog .van-dialog__footer {
+  background: #f8f8f8;
 }
 
 /************************** 统计分页 *****************************/

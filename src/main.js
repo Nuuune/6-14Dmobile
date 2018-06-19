@@ -2,6 +2,7 @@ import Vue from 'vue';
 import App from './App.vue';
 
 import './assets/css/layout.css';
+import './assets/css/font.css';
 import { Step, Steps } from 'vant';
 
 Vue.use(Step).use(Steps);

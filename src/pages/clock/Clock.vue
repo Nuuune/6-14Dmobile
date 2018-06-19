@@ -3,12 +3,12 @@
     <component :is="currTabComponent"></component>
     <!-- 底部切换开始 -->
     <div class="foot-tab flex flex-row align-end">
-      <div @click="changeTab(`Location`)" class="flex flex-center flex-item-1">
-        <div class="icon"><img src="@/assets/images/location.png" /></div>
+      <div @click="changeTab(`Location`)" class="flex flex-center flex-item-1" :class="{'foot-tab-active': isLocation}">
+        <div class="icon icon-location"></div>
         <div class="text">打卡</div>
       </div>
-      <div @click="changeTab(`Count`)" class="flex flex-center flex-item-1">
-        <div class="icon"><img src="@/assets/images/count.png" /></div>
+      <div @click="changeTab(`Count`)" class="flex flex-center flex-item-1" :class="{'foot-tab-active': !isLocation}">
+        <div class="icon icon-count"></div>
         <div class="text">统计</div>
       </div>
     </div>
@@ -30,6 +30,11 @@ export default {
   components: {
     Location,
     Count
+  },
+  computed: {
+    isLocation() {
+      return this.currTabComponent === `Location`;
+    }
   },
   methods: {
     changeTab(name) {

@@ -11,8 +11,7 @@
           <span class="age">2018/06/07</span>
         </div>
       </div>
-      <div @click="popShow" class="icon">
-        <img src="@/assets/images/datemap.png" />
+      <div @click="popShow" class="icon icon-calendar">
       </div>
     </div>
     <!-- 人物信息结束 -->
@@ -23,12 +22,14 @@
           :active="2"
           direction="vertical"
           active-color="#239aed">
-          <van-step><div>上班打卡时间08:53:12</div><div><div></div>上海市普陀区中江路112号</div></van-step>
+          <van-step>
+            <div>上班打卡时间<span class="hlight">08:53:12</span></div>
+            <div><span class="icon-location"></span><span class="hlight">上海市普陀区中江路112号</span></div></van-step>
           <van-step>下班打卡</van-step>
           <van-step>打卡记录时间和位置</van-step>
         </van-steps>
       </div>
-      <div class="dk-btn">
+      <div class="dk-btn" @click="showDialog">
         <div class="circle-bg flex flex-center">
           <div class="text">下班打卡</div>
           <div class="time">17:53:12</div>
@@ -36,10 +37,23 @@
       </div>
     </div>
     <!-- 打卡模块结束 -->
+    <!-- 打卡提示窗开始 -->
+    <Popup v-model="dkshow">
+      <div class="dk-info flex align-stretch">
+        <div class="content flex">
+          <img />
+          <div>打卡成功</div>
+        </div>
+        <div class="footer">
+          <img />
+        </div>
+      </div>
+    </Popup>
+    <!-- 打卡提示窗结束 -->
     <!-- 弹出层开始 -->
     <Popup v-model="show" position="bottom" >
       <div class="flex flex-row flex-between pop-btns">
-        <div class="btn-cancel">取消</div>
+        <div class="btn-cancel" @click="popHidden">取消</div>
         <div class="title" style="fontSize: .32rem">请选择查看时间</div>
         <div class="btn-success" style="opacity:0">确定</div>
       </div>
@@ -53,27 +67,30 @@
           <div>五</div>
           <div>六</div>
         </div>
-        <List
-        v-model="loading"
-        :finished="finished"
-        @load="onLoad">
-          <div class="curr-month" v-for="(month, idex) in monthes" :key="idex">
-            <div class="title">2018年06月</div>
-            <div class="date">
-              <div class="flex" v-for="(item, idex2) in month.dates" :key="idex2">
-                <div class="date-value" :class="'color' + item.color">
-                  {{item && item.value !== null ? item.value : ``}}
-                </div>
-                <div class="date-des">
-                  {{item && item.des !== null ? item.des : ``}}
+        <div class="month-scroll">
+          <List
+          v-model="loading"
+          :finished="finished"
+          @load="onLoad">
+            <div class="curr-month" :class="'m-shape-' + month.shape" v-for="(month, idex) in monthes" :key="idex">
+              <div class="title">{{month.year}}年{{month.month}}月</div>
+              <div class="date">
+                <div class="flex" v-for="(item, idex2) in month.dates" :key="idex2">
+                  <div class="date-value" :class="'color' + item.color">
+                    {{item && item.value !== null ? item.value : ``}}
+                  </div>
+                  <div class="date-des">
+                    {{item && item.des !== null ? item.des : ``}}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </List>
+          </List>
+        </div>
       </div>
     </Popup>
     <!-- 弹出层结束 -->
+
   </div>
 </template>
 <script>
@@ -84,10 +101,11 @@ export default {
   name: 'clock-location',
   data() {
     return {
-      show: true,
+      show: false,
       monthes: [],
       loading: false,
-      finished: false
+      finished: false,
+      dkshow: true
     };
   },
   components: {
@@ -96,20 +114,33 @@ export default {
     Cell
   },
   methods: {
+    showDialog() {
+      this.dkshow = true;
+    },
     popShow() {
       this.show = true;
+    },
+    popHidden() {
+      this.show = false;
     },
     onLoad() {
       setTimeout(() => {
         for (let i = 0; i < 3; i++) {
+          const year = 2018;
+          const month = i + 1;
+          const dates = this.getDates({
+            year,
+            month,
+            color1: [3, 6, 1, 8],
+            color2: [9, 5, 2],
+            des: [{ value: 5, des: `这是周五` }]
+          });
+          const shape = dates.length > 35 ? 'big' : 'small';
           this.monthes.push({
-            dates: this.getDates({
-              year: 2018,
-              month: i + 1,
-              color1: [3, 6, 1, 8],
-              color2: [9, 5, 2],
-              des: [{ value: 5, des: `这是周五` }]
-            })
+            year,
+            month,
+            dates,
+            shape
           });
         }
         this.loading = false;
@@ -141,7 +172,7 @@ export default {
      */
     getDates(option) {
       const { year, month, des, color1, color2 } = option;
-      const firstDay = new Date(year, month, 1);
+      const firstDay = new Date(year, month - 1, 1); // month 从0开始 此处需要 减一
       const offsetDay = firstDay.getDay(); // 得到第一天是周几 就知道要移多少天
       const totalDay = getTotalDay(firstDay);
 
@@ -174,7 +205,6 @@ export default {
         if (color1 && color1.length > 0) {
           if (color1.indexOf(i) > 0) {
             date.color = `1`;
-            console.log(date);
             dates.push(date);
             continue;
           }
@@ -182,12 +212,10 @@ export default {
         if (color2 && color2.length > 0) {
           if (color2.indexOf(i) > 0) {
             date.color = `2`;
-            console.log(date);
             dates.push(date);
             continue;
           }
         }
-        console.log(date);
         dates.push(date);
       }
       console.log(dates);
@@ -197,72 +225,18 @@ export default {
 };
 </script>
 <style>
-.datemap .week {
-  height: .6rem;
-  text-align: center;
-  color: #303030;
-  background: #e0e0e0;
-  font-size: .26rem;
-  position: relative;
-  width: 100vw;
+.dk-info {
+  width: 4.92rem;
+  height: 3.73rem;
+  border-radius: .05rem;
 }
-.datemap .week > div {
-  float: left;
-  height: 100%;
-  width: calc(100% / 7);
-  line-height: .6rem;
+.dk-info .content {
+  flex: 1;
 }
-.datemap .week > div:first-child, .datemap .week > div:last-child {
-  color: #ff9900;
+.dk-info .footer {
+  height: .69rem;
+  background: #f8f8f8;
+  border-top: .04rem solid #f1f1f1;
 }
-.datemap .curr-month {
-  position: relative;
-  width: 100vw;
-  height: 8.8rem;
-  font-size: .26rem;
-  border-bottom: .01rem solid #e4e4e4;
-}
-.datemap .curr-month .title {
-  width: 100%;
-  font-size: .3rem;
-  text-align: center;
-  padding: .2rem 0;
-}
-.datemap .curr-month .date {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-.datemap .curr-month .date > div {
-  width: calc(100% / 7);
-  float: left;
-  height: 1.05rem;
-  margin: .2rem 0 0 0;
-}
-.datemap .curr-month .date-value {
-  border-radius: 50%;
-  width: .44rem;
-  height: .44rem;
-  font-size: .26rem;
-  line-height: .44rem;
-  text-align: center;
-}
-.datemap .curr-month .date-des {
-  font-size: .20rem;
-  color: #b2b2b2;
-  padding-top: .1rem;
-  text-align: center;
-}
-.van-list {
-  height: 9.7rem;
-  overflow-y: scroll;
-}
-.color1 {
-  background: #0fc9d0;
-  color: #fff;
-}
-.color2 {
-  background: #35a5f3;
-  color: #fff;
-}
+
 </style>
