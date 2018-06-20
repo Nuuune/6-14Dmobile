@@ -1,6 +1,8 @@
 <template>
   <div>
-    <component :is="currTabComponent"></component>
+    <keep-alive>
+      <component :is="currTabComponent"></component>
+    </keep-alive>
     <!-- 底部切换开始 -->
     <div class="foot-tab flex flex-row align-end">
       <div @click="changeTab(`Location`)" class="flex flex-center flex-item-1" :class="{'foot-tab-active': isLocation}">

@@ -40,12 +40,12 @@
     <!-- 打卡提示窗开始 -->
     <Popup v-model="dkshow">
       <div class="dk-info flex align-stretch">
-        <div class="content flex">
-          <img />
+        <div class="content flex flex-center">
+          <img src="@/assets/images/Circle.png" />
           <div>打卡成功</div>
         </div>
-        <div class="footer">
-          <img />
+        <div @click="hiddenDialog" class="footer flex flex-center">
+          <img src="@/assets/images/cancel.png" />
         </div>
       </div>
     </Popup>
@@ -105,7 +105,7 @@ export default {
       monthes: [],
       loading: false,
       finished: false,
-      dkshow: true
+      dkshow: false
     };
   },
   components: {
@@ -116,6 +116,9 @@ export default {
   methods: {
     showDialog() {
       this.dkshow = true;
+    },
+    hiddenDialog() {
+      this.dkshow = false;
     },
     popShow() {
       this.show = true;
@@ -228,15 +231,24 @@ export default {
 .dk-info {
   width: 4.92rem;
   height: 3.73rem;
-  border-radius: .05rem;
 }
 .dk-info .content {
   flex: 1;
+  font-size: .4rem;
+}
+.dk-info .content img {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-bottom: .2rem;
 }
 .dk-info .footer {
   height: .69rem;
   background: #f8f8f8;
   border-top: .04rem solid #f1f1f1;
+}
+.dk-info .footer img {
+  width: .42rem;
+  height: .42rem;
 }
 
 </style>
