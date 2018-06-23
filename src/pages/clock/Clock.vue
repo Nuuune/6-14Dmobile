@@ -1,7 +1,7 @@
 <template>
   <div>
     <keep-alive>
-      <component :is="currTabComponent"></component>
+      <component ref="child" :is="currTabComponent" @checkin="checkin"></component>
     </keep-alive>
     <!-- 底部切换开始 -->
     <div class="foot-tab flex flex-row align-end">
@@ -21,17 +21,33 @@
 <script>
 import Location from './components/Location.vue';
 import Count from './components/Count.vue';
+import { api_login, api_checkin, api_records } from '@/api';
 
 export default {
   name: 'Clock',
   data() {
     return {
-      currTabComponent: `Location`
+      currTabComponent: `Location`,
+      token: ''
     };
   },
   components: {
     Location,
     Count
+  },
+  created() {
+    api_login({
+      params: {
+        openid: `1`
+      },
+      success: (data) => {
+        console.log(data);
+        this.token = data.access_token;
+      },
+      fail: (errmsg) => {
+        console.error(errmsg);
+      }
+    });
   },
   computed: {
     isLocation() {
@@ -43,6 +59,37 @@ export default {
       if (this.currTabComponent !== name) {
         this.currTabComponent = name;
       }
+    },
+    getCurrDate() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+
+      return `${year}${month > 9 ? month : '0' + month}${day > 9 ? day : '0' + day}`;
+    },
+    checkin(dk_params) {
+      api_checkin({
+        params: dk_params,
+        success: () => {
+          // 获取当天记录
+          api_records({
+            params: {
+              queryDate: this.getCurrDate()
+            },
+            success: (data) => {
+              this.$refs.child.step(data.data[0].checkinAt, data.data[0].location);
+              console.log(data);
+            },
+            fail: (errmsg) => {
+              console.error(errmsg);
+            }
+          });
+        },
+        fail: (errmsg) => {
+          console.error(errmsg);
+        }
+      });
     }
   }
 };

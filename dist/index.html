@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"><title>d-project</title><link href=/dk/static/css/app.2b24225f13145f3edb9f538dfa2ff28f.css rel=stylesheet></head><body><div id=app></div><script>//屏幕适应
+  		(function (win, doc) {
+  			if (!win.addEventListener) return;
+  			var html = document.documentElement;
+  			function setFont() {
+  				var html = document.documentElement;
+  				var k = 750;
+  				html.style.fontSize = html.clientWidth / k * 100 + "px";
+  			}
+  			setFont();
+  			setTimeout(function () {
+  				setFont();
+  			}, 300);
+  			doc.addEventListener('DOMContentLoaded', setFont, false);
+  			win.addEventListener('resize', setFont, false);
+  			win.addEventListener('load', setFont, false);
+  		})(window, document);</script><script type=text/javascript src=/dk/static/js/manifest.e93c38cab586a10ea7d2.js></script><script type=text/javascript src=/dk/static/js/vendor.768846fb2fe28a0fcc8c.js></script><script type=text/javascript src=/dk/static/js/app.374b6a04c43246439d9e.js></script></body></html>

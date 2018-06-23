@@ -6,6 +6,7 @@
   left: 0;
   right: 0;
   border-top: .02rem solid #c5c3c4;
+  background: #fff;
 }
 .foot-tab > div {
   height: 1rem;
@@ -16,6 +17,8 @@
 }
 .foot-tab .text {
   font-size: .20rem;
+  line-height: .2rem;
+  margin-top: 0.1rem;
 }
 .foot-tab .icon {
   position: relative;
@@ -139,11 +142,11 @@
 }
 /* 打卡模块 */
 .dk-wrap {
-  height: 9.67rem;
+  height: 78vh;
 }
 .dk-view {
   width: 100%;
-  padding: .26rem 0;
+  padding: .26rem 0 0;
 }
 .dk-view .hlight {
   padding-left: .25rem;
@@ -230,6 +233,7 @@
 }
 .van-step--vertical {
   height: 1.3rem;
+  padding: 10px 10px 0 0;
 }
 .van-step__title {
   padding-left: .26rem;

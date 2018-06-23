@@ -16,23 +16,25 @@
     </div>
     <!-- 人物信息结束 -->
     <!-- 打卡模块开始 -->
-    <div class="dk-wrap flex flex-between">
+    <div class="dk-wrap flex">
       <div class="dk-view">
         <van-steps
-          :active="2"
+          :active="dkArr.length - 1"
           direction="vertical"
           active-color="#239aed">
-          <van-step>
-            <div>上班打卡时间<span class="hlight">08:53:12</span></div>
-            <div><span class="icon-location"></span><span class="hlight">上海市普陀区中江路112号</span></div></van-step>
-          <van-step>下班打卡</van-step>
-          <van-step>打卡记录时间和位置</van-step>
+          <van-step v-for="(item,index) in dkArr" :key="index">
+            <div v-if="index === dkArr.length - 1">{{item.text}}{{dkArr.length}}</div>
+            <template v-else>
+              <div>{{index === 0 ? `上班打卡时间` : `下班时间打卡`}}<span class="hlight">{{item.time}}</span></div>
+              <div><span class="icon-location"></span><span class="hlight">{{item.address}}</span></div>
+            </template>
+          </van-step>
         </van-steps>
       </div>
-      <div class="dk-btn" @click="showDialog">
+      <div class="dk-btn" @click="dk">
         <div class="circle-bg flex flex-center">
-          <div class="text">下班打卡</div>
-          <div class="time">17:53:12</div>
+          <div class="text">{{dkArr.length > 1 ? '下班打卡' : '上班打卡'}}</div>
+          <div class="time">{{dkTime}}</div>
         </div>
       </div>
     </div>
@@ -101,11 +103,13 @@ export default {
   name: 'clock-location',
   data() {
     return {
+      dkArr: [{ text: `打卡记录时间和位置` }],
       show: false,
       monthes: [],
       loading: false,
       finished: false,
-      dkshow: false
+      dkshow: false,
+      currTime: new Date()
     };
   },
   components: {
@@ -113,7 +117,69 @@ export default {
     List,
     Cell
   },
+  created() {
+    this.currTime = new Date();
+    this.timerId = setInterval(() => {
+      this.currTime = new Date();
+    }, 1000);
+  },
+  computed: {
+    dkTime() {
+      const h = this.currTime.getHours();
+      const m = this.currTime.getMinutes();
+      const s = this.currTime.getSeconds();
+      return `${h > 9 ? h : '0' + h}:${m > 9 ? m : '0' + m}:${s > 9 ? s : '0' + s}`;
+    }
+  },
   methods: {
+    step(ts, location) {
+      const td = new Date(ts);
+      const h = td.getHours();
+      const m = td.getMinutes();
+      const s = td.getSeconds();
+      const time_str = `${h > 9 ? h : '0' + h}:${m > 9 ? m : '0' + m}:${s > 9 ? s : '0' + s}`;
+      if (this.dkArr.length > 1) {
+        this.dkArr = [this.dkArr[0]].concat([{ time: time_str, address: location }], [this.dkArr[1]]);
+      } else {
+        this.dkArr = [{ time: time_str, address: location }].concat(this.dkArr);
+      }
+    },
+    async dk() {
+      if (this.dkArr.length > 2) {
+        return;
+      };
+      try {
+        const localInfo = await this.getLocation();
+        const image = await this.getImage();
+        this.$emit(`checkin`, Object.assign({}, localInfo, { image }));
+      } catch (e) {
+        alert(`打卡失败`);
+      }
+    },
+    // 获取相片
+    getImage() {
+      return new Promise((resolve, reject) => {
+        resolve('');
+      });
+    },
+    // 获取地理位置
+    getLocation() {
+      const data = {};
+      return new Promise((resolve, reject) => {
+        window.geolocation.getCurrentPosition((status, result) => {
+          console.log(result);
+          if (status === `complete`) {
+            data.location = result.formattedAddress;
+            data.lat = result.position.lat;
+            data.lng = result.position.lng;
+            data.type = this.dkArr.length - 1;
+            resolve(data);
+          } else {
+            throw new Error(`获取位置失败：${result.message}`);
+          }
+        });
+      });
+    },
     showDialog() {
       this.dkshow = true;
     },
