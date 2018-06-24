@@ -146,9 +146,12 @@
 }
 .dk-view {
   width: 100%;
-  padding: .26rem 0 0;
+  padding: .26rem 0;
+  max-height: 4rem;
+  overflow-y: scroll;
 }
 .dk-view .hlight {
+  line-height: .3rem;
   padding-left: .25rem;
   color: #000;
 }
@@ -204,10 +207,10 @@
   text-align: center;
   line-height: .40rem;
 }
-.van-step:first-child  .van-step__circle::after {
+.van-step:nth-child(odd)  .van-step__circle::after {
   content: '上';
 }
-.van-step:not(:first-child)  .van-step__circle::after {
+.van-step:nth-child(even)  .van-step__circle::after {
   content: '下';
 }
 .van-step--vertical .van-icon-checked {
@@ -234,6 +237,8 @@
 .van-step--vertical {
   height: 1.3rem;
   padding: 10px 10px 0 0;
+  height: 1.5rem;
+  padding: 0.2rem 10px 0 0;
 }
 .van-step__title {
   padding-left: .26rem;

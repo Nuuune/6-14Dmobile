@@ -7,8 +7,8 @@
           <img src="../../../assets/images/avatar_03.png" />
         </div>
         <div class="flex flex-between align-start des">
-          <span class="name">王某某</span>
-          <span class="age">2018/06/07</span>
+          <span class="name">{{userInfo.name}}</span>
+          <span class="age">{{year}}/{{month}}/{{day}}</span>
         </div>
       </div>
       <div @click="popShow" class="icon icon-calendar">
@@ -18,22 +18,24 @@
     <!-- 打卡模块开始 -->
     <div class="dk-wrap flex">
       <div class="dk-view">
-        <van-steps
-          :active="dkArr.length - 1"
-          direction="vertical"
-          active-color="#239aed">
-          <van-step v-for="(item,index) in dkArr" :key="index">
-            <div v-if="index === dkArr.length - 1">{{item.text}}{{dkArr.length}}</div>
-            <template v-else>
-              <div>{{index === 0 ? `上班打卡时间` : `下班时间打卡`}}<span class="hlight">{{item.time}}</span></div>
-              <div><span class="icon-location"></span><span class="hlight">{{item.address}}</span></div>
-            </template>
-          </van-step>
-        </van-steps>
+        <template v-if="hackReset">
+          <van-steps
+            :active="dkArr.length - 1"
+            direction="vertical"
+            active-color="#239aed">
+            <van-step v-for="(item,index) in dkArr" :key="index">
+              <div v-if="index === dkArr.length - 1">{{item.text}}</div>
+              <template v-else>
+                <div>{{index === 0 ? `上班打卡时间` : `下班时间打卡`}}<span class="hlight">{{item.time}}</span></div>
+                <div><span class="icon-location"></span><span class="hlight">{{item.address}}</span></div>
+              </template>
+            </van-step>
+          </van-steps>
+        </template>
       </div>
-      <div class="dk-btn" @click="dk">
+      <div class="dk-btn" @touchend="dk">
         <div class="circle-bg flex flex-center">
-          <div class="text">{{dkArr.length > 1 ? '下班打卡' : '上班打卡'}}</div>
+          <div class="text">{{click_btn_text}}</div>
           <div class="time">{{dkTime}}</div>
         </div>
       </div>
@@ -77,7 +79,7 @@
             <div class="curr-month" :class="'m-shape-' + month.shape" v-for="(month, idex) in monthes" :key="idex">
               <div class="title">{{month.year}}年{{month.month}}月</div>
               <div class="date">
-                <div class="flex" v-for="(item, idex2) in month.dates" :key="idex2">
+                <div @click="showTheDay(month.year, month.month, item.value)" class="flex" v-for="(item, idex2) in month.dates" :key="idex2">
                   <div class="date-value" :class="'color' + item.color">
                     {{item && item.value !== null ? item.value : ``}}
                   </div>
@@ -97,19 +99,26 @@
 </template>
 <script>
 import { List, Popup, Cell } from 'vant';
-import { getTotalDay } from '@/utils/date';
+import { getTotalDay, dateToHms, tsToYMD } from '@/utils/date';
+import { arr_insert } from '@/utils/arr';
+import { api_checkin, api_records } from '@/api';
+
+const default_dkArr = [{ text: `打卡记录时间和位置` }];
 
 export default {
   name: 'clock-location',
+  props: ['today', 'userInfo'],
   data() {
     return {
-      dkArr: [{ text: `打卡记录时间和位置` }],
+      dkArr: [].concat(default_dkArr),
       show: false,
       monthes: [],
       loading: false,
       finished: false,
       dkshow: false,
-      currTime: new Date()
+      currTime: new Date(),
+      myDay: ``,
+      hackReset: true
     };
   },
   components: {
@@ -122,60 +131,201 @@ export default {
     this.timerId = setInterval(() => {
       this.currTime = new Date();
     }, 1000);
+    this.myDay = new Date(this.today.getTime());
+    this.getData(this.myDay.getTime());
+    this.getLocation();
   },
   computed: {
     dkTime() {
-      const h = this.currTime.getHours();
-      const m = this.currTime.getMinutes();
-      const s = this.currTime.getSeconds();
-      return `${h > 9 ? h : '0' + h}:${m > 9 ? m : '0' + m}:${s > 9 ? s : '0' + s}`;
+      return dateToHms(this.currTime);
+    },
+    click_btn_text() {
+      switch (this.dkArr.length) {
+        case 1:
+          return `上班打卡`;
+        case 2:
+          return `下班打卡`;
+        case 3:
+          return `今日结束`;
+      }
+    },
+    year() {
+      return this.myDay.getFullYear();
+    },
+    month() {
+      const m = this.myDay.getMonth() + 1;
+      return m > 9 ? m : `0${m}`;
+    },
+    day() {
+      const d = this.myDay.getDate();
+      return d > 9 ? d : `0${d}`;
     }
   },
   methods: {
-    step(ts, location) {
+    // 重置步进条
+    stepReset() {
+      this.hackReset = false;
+      this.$nextTick(() => {
+        this.hackReset = true;
+      });
+    },
+    // 显示指定日子的打卡
+    showTheDay(y, m, d) {
+      const ts = new Date(y, m - 1, d).getTime();
+      this.myDay = new Date(ts);
+      this.getData(ts);
+      this.popHidden();
+    },
+    // 获取制定时间记录
+    getData(ts, noTrans) {
+      let _ts;
+      if (noTrans) _ts = ts;
+      else _ts = tsToYMD(ts);
+      api_records({
+        params: {
+          queryDate: _ts
+        },
+        success: (data) => {
+          this.dkArr = [].concat(default_dkArr);
+          this.stepReset();
+
+          const myData = data.data;
+          let type0 = null;
+          let type1 = null;
+          for (let i = 0; i < myData.length; i++) {
+            const { checkinAt, location, type } = myData[i];
+            if (!type0 && type === 0) {
+              type0 = { checkinAt, location, type };
+              continue;
+            }
+            if (!type1 && type === 1) {
+              type1 = { checkinAt, location, type };
+              continue;
+            }
+            if (type0 && type1) break;
+          }
+          type0 && this.step(type0.checkinAt, type0.location, type0.type);
+          type0 && type1 && this.step(type1.checkinAt, type1.location, type1.type);
+          console.log(data);
+        },
+        fail: (errmsg) => {
+          console.error(errmsg);
+        }
+      });
+    },
+    checkin(dk_params) {
+      api_checkin({
+        params: dk_params,
+        success: () => {
+          // 获取当天记录
+          api_records({
+            params: {
+              queryDate: tsToYMD(Date.now())
+            },
+            success: (data) => {
+              const { checkinAt, location, type } = data.data[0];
+              this.step(checkinAt, location, type);
+              console.log(data);
+            },
+            fail: (errmsg) => {
+              console.error(errmsg);
+            }
+          });
+        },
+        fail: (errmsg) => {
+          console.error(errmsg);
+        }
+      });
+    },
+    step(ts, location, type) {
       const td = new Date(ts);
-      const h = td.getHours();
-      const m = td.getMinutes();
-      const s = td.getSeconds();
-      const time_str = `${h > 9 ? h : '0' + h}:${m > 9 ? m : '0' + m}:${s > 9 ? s : '0' + s}`;
-      if (this.dkArr.length > 1) {
-        this.dkArr = [this.dkArr[0]].concat([{ time: time_str, address: location }], [this.dkArr[1]]);
-      } else {
-        this.dkArr = [{ time: time_str, address: location }].concat(this.dkArr);
+      const time_str = dateToHms(td);
+      arr_insert(this.dkArr, { time: time_str, address: location }, type);
+      this.stepReset();
+      if (this.dkArr.length > 2) {
+        this.dkArr[2] = { text: '今日已完成签到' };
       }
     },
     async dk() {
+      if (!window.geolocation) {
+        return this.$toast({
+          message: `无高德组件`,
+          forbidClick: true,
+          duration: 1500
+        });
+      }
       if (this.dkArr.length > 2) {
         return;
       };
       try {
         const localInfo = await this.getLocation();
         const image = await this.getImage();
-        this.$emit(`checkin`, Object.assign({}, localInfo, { image }));
+        localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
       } catch (e) {
-        alert(`打卡失败`);
+        this.$toast({
+          message: `打卡失败`,
+          forbidClick: true,
+          duration: 1500
+        });
       }
     },
     // 获取相片
     getImage() {
       return new Promise((resolve, reject) => {
-        resolve('');
+        try {
+          window.LandaJS.requestCamera((image) => {
+            resolve('');
+          });
+        } catch (err) {
+          this.$toast(err);
+          resolve(false);
+        }
+      });
+    },
+    // 获取设备地理位置
+    getNativeXY() {
+      return new Promise((resolve, reject) => {
+        try {
+          window.LandaJS.requestGeo((loc) => {
+            resolve([loc.coords.longitude, loc.coords.latitude]);
+          });
+        } catch (err) {
+          this.$toast(err);
+          resolve(false);
+        }
       });
     },
     // 获取地理位置
-    getLocation() {
+    async getLocation() {
+      const lnglatXY = await this.getNativeXY(); // 已知点坐标
+      if (!lnglatXY) {
+        return false;
+      };
       const data = {};
+      const transLnglatXY = await this.getGDlnglat(lnglatXY);
       return new Promise((resolve, reject) => {
-        window.geolocation.getCurrentPosition((status, result) => {
-          console.log(result);
+        window.geolocation.getAddress(transLnglatXY, (status, result) => {
           if (status === `complete`) {
-            data.location = result.formattedAddress;
-            data.lat = result.position.lat;
-            data.lng = result.position.lng;
+            data.location = result.regeocode.formattedAddress;
+            data.lat = transLnglatXY[1];
+            data.lng = transLnglatXY[0];
             data.type = this.dkArr.length - 1;
             resolve(data);
           } else {
+            resolve(false);
             throw new Error(`获取位置失败：${result.message}`);
+          };
+        });
+      });
+    },
+    // 转换高德经纬度
+    getGDlnglat(lnglat) {
+      return new Promise((resolve, reject) => {
+        window.AMap.convertFrom(lnglat, `gps`, (status, result) => {
+          if (status === `complete`) {
+            resolve([result.locations[0].lng, result.locations[0].lat]);
+          } else {
+            throw new Error(`转换失败：${result.info}`);
           }
         });
       });
@@ -194,27 +344,40 @@ export default {
     },
     onLoad() {
       setTimeout(() => {
+        console.log(this);
         for (let i = 0; i < 3; i++) {
-          const year = 2018;
-          const month = i + 1;
-          const dates = this.getDates({
-            year,
-            month,
-            color1: [3, 6, 1, 8],
-            color2: [9, 5, 2],
-            des: [{ value: 5, des: `这是周五` }]
-          });
+          let _month = this.today.getMonth() + 1 - i;
+          let _year = this.today.getFullYear();
+          let dates;
+          if (_month < 1) {
+            _month += 12;
+            _year -= 1;
+          }
+          if (this.today.getMonth() + 1 === _month && this.today.getFullYear() === _year) {
+            console.log(typeof this.today.getDate());
+            dates = this.getDates({
+              year: _year,
+              month: _month,
+              color1: [24],
+              des: [{ value: this.today.getDate(), des: `今天` }]
+            });
+          } else {
+            dates = this.getDates({
+              year: _year,
+              month: _month
+            });
+          }
           const shape = dates.length > 35 ? 'big' : 'small';
           this.monthes.push({
-            year,
-            month,
+            year: _year,
+            month: _month,
             dates,
             shape
           });
         }
         this.loading = false;
 
-        if (this.monthes.length >= 5) {
+        if (this.monthes.length >= 3) {
           this.finished = true;
         }
       }, 500);
@@ -272,14 +435,14 @@ export default {
 
         // 处理颜色部分
         if (color1 && color1.length > 0) {
-          if (color1.indexOf(i) > 0) {
+          if (color1.indexOf(i) > -1) {
             date.color = `1`;
             dates.push(date);
             continue;
           }
         }
         if (color2 && color2.length > 0) {
-          if (color2.indexOf(i) > 0) {
+          if (color2.indexOf(i) > -1) {
             date.color = `2`;
             dates.push(date);
             continue;

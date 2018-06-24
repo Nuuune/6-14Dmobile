@@ -11,16 +11,28 @@ import { get, post, set_headerConf } from '@/axios';
  */
 export const api_login = function(option = {}) {
   const params = option.params ? option.params : {};
-  console.log(params);
+  console.log(_context);
+  _context.$toast.loading({
+    mask: true,
+    forbidClick: true,
+    duration: 0,
+    message: `加载中`
+  });
   post(`/app/login`, params)
   .then(data => {
     set_headerConf({
       token: data.access_token
     });
     option.success && option.success(data);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   })
   .catch(errMsg => {
     option.fail && option.fail(errMsg);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   });
 };
 
@@ -35,33 +47,75 @@ export const api_login = function(option = {}) {
  */
 export const api_checkin = function(option = {}) {
   const params = option.params ? option.params : {};
+  _context.$toast.loading({
+    mask: true,
+    forbidClick: true,
+    duration: 0,
+    message: `加载中`
+  });
   post(`/app/checkin`, params)
   .then(data => {
     option.success && option.success(data);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   })
   .catch(errMsg => {
     option.fail && option.fail(errMsg);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   });
 };
 
 export const api_records = function(option = {}) {
   const params = option.params ? option.params : {};
+  _context.$toast.loading({
+    mask: true,
+    forbidClick: true,
+    duration: 0,
+    message: `加载中`
+  });
   get(`/app/records`, params)
   .then(data => {
     option.success && option.success(data);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   })
   .catch(errMsg => {
     option.fail && option.fail(errMsg);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   });
 };
 
 export const api_stat = function(option = {}) {
   const params = option.params ? option.params : {};
+  _context.$toast.loading({
+    mask: true,
+    forbidClick: true,
+    duration: 0,
+    message: `加载中`
+  });
   get(`/app/stat`, params)
   .then(data => {
     option.success && option.success(data);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   })
   .catch(errMsg => {
     option.fail && option.fail(errMsg);
+    setTimeout(() => {
+      _context.$toast.clear();
+    }, 500);
   });
 };
+
+let _context;
+
+export function set_api_context(ctx) {
+  _context = ctx;
+}

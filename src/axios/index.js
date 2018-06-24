@@ -110,14 +110,14 @@ export const get = function(url, params) {
 
 export const post = function(url, params) {
   return new Promise((resolve, reject) => {
-    const _qs = params ? qs.stringify(params, { arrayFormat: 'brackets' }) : null;
-    let _url;
-    if (_qs) {
-      _url = `${url}?${_qs}`;
-    } else {
-      _url = url;
-    }
-    instance.post(_url, {}, { headers: header_config })
+    // const _qs = params ? qs.stringify(params, { arrayFormat: 'brackets' }) : null;
+    // let _url;
+    // if (_qs) {
+    //   _url = `${url}?${_qs}`;
+    // } else {
+    //   _url = url;
+    // }
+    instance.post(url, params, { headers: header_config })
     .then(resp => {
       // 网络出错
       if (resp.status !== 200) {

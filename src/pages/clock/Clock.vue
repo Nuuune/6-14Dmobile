@@ -1,8 +1,10 @@
 <template>
   <div>
-    <keep-alive>
-      <component ref="child" :is="currTabComponent" @checkin="checkin"></component>
-    </keep-alive>
+    <template v-if="isLogin">
+      <keep-alive>
+        <component ref="child" :today="today" :userInfo="userInfo" :is="currTabComponent"></component>
+      </keep-alive>
+    </template>
     <!-- 底部切换开始 -->
     <div class="foot-tab flex flex-row align-end">
       <div @click="changeTab(`Location`)" class="flex flex-center flex-item-1" :class="{'foot-tab-active': isLocation}">
@@ -21,14 +23,19 @@
 <script>
 import Location from './components/Location.vue';
 import Count from './components/Count.vue';
-import { api_login, api_checkin, api_records } from '@/api';
+import { api_login } from '@/api';
+import { set_headerConf } from '@/axios';
 
 export default {
   name: 'Clock',
   data() {
     return {
       currTabComponent: `Location`,
-      token: ''
+      isLogin: false,
+      today: new Date(),
+      userInfo: {
+        name: ''
+      }
     };
   },
   components: {
@@ -36,18 +43,30 @@ export default {
     Count
   },
   created() {
-    api_login({
-      params: {
-        openid: `1`
-      },
-      success: (data) => {
-        console.log(data);
-        this.token = data.access_token;
-      },
-      fail: (errmsg) => {
-        console.error(errmsg);
-      }
-    });
+    // 获取角色相关信息
+    try {
+      window.LandaJS.ready(function() {
+        const user_name = window.LandaJS.getUserInfo().name;
+        const init_token = window.LandaJS.getAccessToken();
+        set_headerConf({ token: init_token });
+        this.userInfo = {
+          name: user_name
+        };
+        api_login({
+          params: {
+            openid: `1`
+          },
+          success: () => {
+            this.isLogin = true;
+          },
+          fail: (errmsg) => {
+            console.error(errmsg);
+          }
+        });
+      });
+    } catch (err) {
+      alert(err);
+    }
   },
   computed: {
     isLocation() {
@@ -59,37 +78,6 @@ export default {
       if (this.currTabComponent !== name) {
         this.currTabComponent = name;
       }
-    },
-    getCurrDate() {
-      const date = new Date();
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
-
-      return `${year}${month > 9 ? month : '0' + month}${day > 9 ? day : '0' + day}`;
-    },
-    checkin(dk_params) {
-      api_checkin({
-        params: dk_params,
-        success: () => {
-          // 获取当天记录
-          api_records({
-            params: {
-              queryDate: this.getCurrDate()
-            },
-            success: (data) => {
-              this.$refs.child.step(data.data[0].checkinAt, data.data[0].location);
-              console.log(data);
-            },
-            fail: (errmsg) => {
-              console.error(errmsg);
-            }
-          });
-        },
-        fail: (errmsg) => {
-          console.error(errmsg);
-        }
-      });
     }
   }
 };
