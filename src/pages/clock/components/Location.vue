@@ -176,7 +176,7 @@ export default {
       this.getData(ts);
       this.popHidden();
     },
-    // 获取制定时间记录
+    // 获取指定时间记录
     getData(ts, noTrans) {
       let _ts;
       if (noTrans) _ts = ts;
@@ -260,7 +260,8 @@ export default {
       try {
         const localInfo = await this.getLocation();
         const image = await this.getImage();
-        localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
+        // localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
+        localInfo && this.checkin(Object.assign({}, localInfo, { image }));
       } catch (e) {
         this.$toast({
           message: `打卡失败`,
@@ -273,9 +274,9 @@ export default {
     getImage() {
       return new Promise((resolve, reject) => {
         try {
-          window.LandaJS.requestCamera((image) => {
-            resolve('');
-          });
+          // window.LandaJS.requestCamera((image) => {
+          resolve('');
+          // });
         } catch (err) {
           this.$toast(err);
           resolve(false);

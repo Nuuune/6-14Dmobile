@@ -45,7 +45,7 @@ export default {
   created() {
     // 获取角色相关信息
     try {
-      window.LandaJS.ready(function() {
+      window.LandaJS.ready(() => {
         const user_name = window.LandaJS.getUserInfo().name;
         const init_token = window.LandaJS.getAccessToken();
         set_headerConf({ token: init_token });
