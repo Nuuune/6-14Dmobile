@@ -48,7 +48,7 @@ export default {
       window.LandaJS.ready(() => {
         const user_name = window.LandaJS.getUserInfo().name;
         const init_token = window.LandaJS.getAccessToken();
-        set_headerConf({ token: init_token });
+        set_headerConf({ token: `${init_token}` });
         this.userInfo = {
           name: user_name
         };

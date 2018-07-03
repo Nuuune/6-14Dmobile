@@ -3,7 +3,7 @@ import { config } from './config';
 import qs from 'qs';
 
 const header_config = {
-  corp_key: `1`,
+  corpKey: `4`,
   token: `eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjYjkwYjdhZGEwMTA0NDc0OGY1MjIwMzJkNjJmMDYxZiIsInVuaW9uaWQiOiJjYjkwYjdhZGEwMTA0NDc0OGY1MjIwMzJkNjJmMDYxZiIsImlzcyI6ImxhbmRhIiwiYXVkIjoiTEFOREFfTUFTX1NTTyIsImV4cCI6MTUyOTgzNDE3NCwibmJmIjoxNTI5NjYxMzc0fQ.hYpA4pU8T6oLJ4TVjMFg3Uz1kA3fE8Sh5VHY554trCw`
 };
 
@@ -12,7 +12,7 @@ function _change_token(newOne) {
 };
 
 function _change_corpKey(newOne) {
-  header_config.corp_key = newOne;
+  header_config.corpKey = newOne;
 };
 
 export function set_headerConf(config = {}) {

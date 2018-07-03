@@ -148,7 +148,7 @@
   width: 100%;
   padding: .26rem 0;
   max-height: 4rem;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 }
 .dk-view .hlight {
   line-height: .3rem;

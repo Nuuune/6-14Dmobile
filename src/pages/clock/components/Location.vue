@@ -247,6 +247,7 @@ export default {
       }
     },
     async dk() {
+      // alert(`开始打卡`);
       if (!window.geolocation) {
         return this.$toast({
           message: `无高德组件`,
@@ -259,7 +260,9 @@ export default {
       };
       try {
         const localInfo = await this.getLocation();
+        // alert(`地理信息${localInfo}`);
         const image = await this.getImage();
+        // alert(`照片信息${image}`);
         localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
         // localInfo && this.checkin(Object.assign({}, localInfo, { image }));
       } catch (e) {
@@ -274,11 +277,17 @@ export default {
     getImage() {
       return new Promise((resolve, reject) => {
         try {
+          // alert(`开始拍照`);
           window.LandaJS.requestCamera((image) => {
+            // alert(`拍照成功回调`);
             resolve('111');
           });
         } catch (err) {
-          this.$toast(err);
+          this.$toast({
+            message: `拍照失败: ${err}`,
+            forbidClick: true,
+            duration: 1500
+          });
           resolve(false);
         }
       });
@@ -287,11 +296,17 @@ export default {
     getNativeXY() {
       return new Promise((resolve, reject) => {
         try {
+          // alert(`开始获取设备地址`);
           window.LandaJS.requestGeo((loc) => {
+            // alert(`获取设备地址成功回调`);
             resolve([loc.coords.longitude, loc.coords.latitude]);
           });
         } catch (err) {
-          this.$toast(err);
+          this.$toast({
+            message: `获取设备地址失败: ${err}`,
+            forbidClick: true,
+            duration: 1500
+          });
           resolve(false);
         }
       });
@@ -305,8 +320,10 @@ export default {
       const data = {};
       const transLnglatXY = await this.getGDlnglat(lnglatXY);
       return new Promise((resolve, reject) => {
+        // alert(`开始获取设备高德地址`);
         window.geolocation.getAddress(transLnglatXY, (status, result) => {
           if (status === `complete`) {
+            // alert(`获取高德地址成功`);
             data.location = result.regeocode.formattedAddress;
             data.lat = transLnglatXY[1];
             data.lng = transLnglatXY[0];
@@ -322,8 +339,10 @@ export default {
     // 转换高德经纬度
     getGDlnglat(lnglat) {
       return new Promise((resolve, reject) => {
+        // alert(`开始转换设备地址`);
         window.AMap.convertFrom(lnglat, `gps`, (status, result) => {
           if (status === `complete`) {
+            // alert(`转换设备地址成功`);
             resolve([result.locations[0].lng, result.locations[0].lat]);
           } else {
             throw new Error(`转换失败：${result.info}`);
