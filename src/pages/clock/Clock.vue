@@ -43,23 +43,28 @@ export default {
     Count
   },
   created() {
+    // alert(`加载打卡页面`);
     // 获取角色相关信息
     try {
       window.LandaJS.ready(() => {
-        const user_name = window.LandaJS.getUserInfo().name;
+        const userInfo = window.LandaJS.getUserInfo();
+        const user_corpId = userInfo.corpId;
+        const user_openid = userInfo.openid;
         const init_token = window.LandaJS.getAccessToken();
-        set_headerConf({ token: `${init_token}` });
-        this.userInfo = {
-          name: user_name
-        };
+        // alert(`Landa准备好了`);
+        // alert(`user_corpId: ${user_corpId}\nuser_openid: ${user_openid}\ninit_token: ${init_token}`);
+        set_headerConf({ token: `${init_token}`, corp_key: user_corpId });
+        this.userInfo = userInfo;
         api_login({
           params: {
-            openid: `1`
+            openid: user_openid
           },
           success: () => {
+            // alert(`登陆成功`);
             this.isLogin = true;
           },
           fail: (errmsg) => {
+            // alert(`登陆失败: ${errmsg}`);
             console.error(errmsg);
           }
         });

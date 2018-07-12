@@ -101,6 +101,7 @@
 import { List, Popup, Cell } from 'vant';
 import { getTotalDay, dateToHms, tsToYMD } from '@/utils/date';
 import { arr_insert } from '@/utils/arr';
+// import { GPS } from '@/utils/GPS';
 import { api_checkin, api_records } from '@/api';
 
 const default_dkArr = [{ text: `打卡记录时间和位置` }];
@@ -263,8 +264,8 @@ export default {
         // alert(`地理信息${localInfo}`);
         const image = await this.getImage();
         // alert(`照片信息${image}`);
-        localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
-        // localInfo && this.checkin(Object.assign({}, localInfo, { image }));
+        // localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
+        localInfo && this.checkin(Object.assign({}, localInfo, { image }));
       } catch (e) {
         this.$toast({
           message: `打卡失败`,
@@ -278,10 +279,10 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           // alert(`开始拍照`);
-          window.LandaJS.requestCamera((image) => {
-            // alert(`拍照成功回调`);
-            resolve('111');
-          });
+          // window.LandaJS.requestCamera((image) => {
+          //   alert(`拍照成功回调`);
+          resolve('111');
+          // });
         } catch (err) {
           this.$toast({
             message: `拍照失败: ${err}`,
@@ -299,7 +300,7 @@ export default {
           // alert(`开始获取设备地址`);
           window.LandaJS.requestGeo((loc) => {
             // alert(`获取设备地址成功回调`);
-            resolve([loc.coords.longitude, loc.coords.latitude]);
+            loc && resolve([loc.longitude, loc.latitude]);
           });
         } catch (err) {
           this.$toast({
@@ -318,7 +319,9 @@ export default {
         return false;
       };
       const data = {};
-      const transLnglatXY = await this.getGDlnglat(lnglatXY);
+      // const transLnglatXY = await this.getGDlnglat(lnglatXY);
+      const transLnglatXY = lnglatXY;
+      // alert(`${transLnglatXY[0]}\n${transLnglatXY[1]}`);
       return new Promise((resolve, reject) => {
         // alert(`开始获取设备高德地址`);
         window.geolocation.getAddress(transLnglatXY, (status, result) => {
@@ -328,6 +331,7 @@ export default {
             data.lat = transLnglatXY[1];
             data.lng = transLnglatXY[0];
             data.type = this.dkArr.length - 1;
+            // alert(data.location);
             resolve(data);
           } else {
             resolve(false);
@@ -340,6 +344,8 @@ export default {
     getGDlnglat(lnglat) {
       return new Promise((resolve, reject) => {
         // alert(`开始转换设备地址`);
+        // const agps = GPS.gcj_encrypt(lnglat[1], lnglat[0]);
+        // resolve([agps.lon, agps.lat]);
         window.AMap.convertFrom(lnglat, `gps`, (status, result) => {
           if (status === `complete`) {
             // alert(`转换设备地址成功`);
