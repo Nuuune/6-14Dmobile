@@ -134,7 +134,6 @@ export default {
     }, 1000);
     this.myDay = new Date(this.today.getTime());
     this.getData(this.myDay.getTime());
-    this.getLocation();
   },
   computed: {
     dkTime() {
@@ -211,6 +210,11 @@ export default {
         },
         fail: (errmsg) => {
           console.error(errmsg);
+          this.$toast({
+            message: errmsg,
+            forbidClick: true,
+            duration: 1500
+          });
         }
       });
     },
@@ -230,11 +234,21 @@ export default {
             },
             fail: (errmsg) => {
               console.error(errmsg);
+              this.$toast({
+                message: errmsg,
+                forbidClick: true,
+                duration: 1500
+              });
             }
           });
         },
         fail: (errmsg) => {
           console.error(errmsg);
+          this.$toast({
+            message: errmsg,
+            forbidClick: true,
+            duration: 1500
+          });
         }
       });
     },
@@ -262,10 +276,16 @@ export default {
       try {
         const localInfo = await this.getLocation();
         // alert(`地理信息${localInfo}`);
+        this.$toast.loading({
+          mask: true,
+          forbidClick: true,
+          duration: 0
+        });
         const image = await this.getImage();
         // alert(`照片信息${image}`);
-        // localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
-        localInfo && this.checkin(Object.assign({}, localInfo, { image }));
+        this.$toast.clear();
+        localInfo && image && this.checkin(Object.assign({}, localInfo, { image }));
+        // localInfo && this.checkin(Object.assign({}, localInfo, { image }));
       } catch (e) {
         this.$toast({
           message: `打卡失败`,
@@ -279,10 +299,11 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           // alert(`开始拍照`);
-          // window.LandaJS.requestCamera((image) => {
-          //   alert(`拍照成功回调`);
-          resolve('111');
-          // });
+          window.LandaJS.requestCamera((image) => {
+            // alert(`拍照成功回调`);
+            // alert(`${JSON.stringify(image)}`);
+            resolve(image.data);
+          });
         } catch (err) {
           this.$toast({
             message: `拍照失败: ${err}`,
